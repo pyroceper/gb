@@ -1,8 +1,9 @@
 #include "cpu.h"
 
-CPU::CPU(const std::string &path)
+CPU::CPU(const std::string &bootrom_path, const std::string &rom_path)
 {
-    memory.load_ROM(path);
+    memory.load_bootROM(bootrom_path);
+    memory.load_ROM(rom_path);
     memory.write(0xFF44, 0x90);// ppu ly register
 }
 
@@ -40,9 +41,9 @@ void CPU::execute()
     //temp
     fmt::print("\nPC: {0:#x}\n", reg_pc - 1);
     fmt::print("opcode: {0:#x}\n", opcode);
-    fmt::print("A: {0:#x} B: {0:#x} C: {0:#x} D: {0:#x} E: {0:#x}\n", get_reg_A(), get_reg_B(), get_reg_C(), get_reg_D(), get_reg_E());
-    fmt::print("H: {0:#x} L: {0:#x}\n", get_reg_H(), get_reg_L());
-    fmt::print("SP: {0:#x}\n", reg_sp);
+    fmt::print("A: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X}\n", get_reg_A(), get_reg_B(), get_reg_C(), get_reg_D(), get_reg_E());
+    fmt::print("H: {:02X} L: {:02X}\n", get_reg_H(), get_reg_L());
+    fmt::print("SP: {:02X}\n", reg_sp);    
 
     switch(opcode)
     {
@@ -323,7 +324,7 @@ void CPU::cb_opcodes()
 {
     //fetch
     uint8_t opcode = fetch_byte();
-    //fmt::print("opcode: {0:#x}\n", opcode);
+    fmt::print("opcode: {0:#x}\n", opcode);
 
     switch(opcode)
     {
@@ -1545,18 +1546,18 @@ void CPU::bit_r8(uint16_t &reg, bool is_high, int bit) // BIT u3, r8
     else 
         val = Register::get_register_low(reg);
     bool test_bit = val & (1 << bit);
-    set_zero_flag(val == 0);
+    set_zero_flag(test_bit == 0);
     set_subtraction_flag(false);
-    set_halfcarry_flag(false);    
+    set_halfcarry_flag(true);    
 }
 void CPU::bit_mHL(int bit) // BIT u3, [HL]
 {
     increment_cycle();
     uint8_t val = read(reg_hl);
     bool test_bit = val & (1 << bit);
-    set_zero_flag(val == 0);
+    set_zero_flag(test_bit == 0);
     set_subtraction_flag(false);
-    set_halfcarry_flag(false); 
+    set_halfcarry_flag(true); 
 }
 void CPU::res_r8(uint16_t &reg, bool is_high, int bit) // RES u3, r8
 {

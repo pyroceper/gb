@@ -15,7 +15,7 @@
 class CPU
 {
     public:
-        CPU(const std::string &path);
+        CPU(const std::string &bootrom_path, const std::string &rom_path);
         void execute();
 
         void interrupt_handler();
@@ -27,7 +27,7 @@ class CPU
 
         Memory memory;
 
-    //private:
+    private:
         uint16_t reg_af {};
         uint16_t reg_bc {};
         uint16_t reg_de {};
@@ -48,7 +48,7 @@ class CPU
         uint8_t get_reg_E();
         uint8_t get_reg_H();
         uint8_t get_reg_L();
-    private:
+    // private:
         // 7 6 5 4
         // Z N H C
         void set_carry_flag(bool val);

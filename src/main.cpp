@@ -4,13 +4,14 @@
 #include "memory.h"
 #include "cpu.h"
 #include "util/register.h"
+#include "util/logger.h"
 
 
 int main()
 {
     fmt::print("Gameboy emulator\n");
 
-    CPU cpu("tests/dmg_boot.bin");
+    CPU cpu("tests/dmg_boot.bin", "tests/individual/06-ld r,r.gb");
     
     //temp
     // cpu.reg_pc = 0x100;
@@ -18,8 +19,8 @@ int main()
     // cpu.reg_af = 0x1180;
     // cpu.reg_de = 0xFF56;
     // cpu.reg_hl = 0x000D;
-    cpu.reg_sp = 0xFFFE;
 
+    Logger::debug = true;
 
     //temp
     char step {};

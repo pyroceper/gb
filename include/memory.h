@@ -10,8 +10,10 @@
 class Memory
 {
     public:
+        void load_bootROM(const std::string &path);
         void load_ROM(const std::string &path);
 
+        std::array<uint8_t, 0x100> bootrom;
         std::array<uint8_t, 0x10000> rom;
 
         uint8_t read(uint16_t address);
