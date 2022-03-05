@@ -745,47 +745,65 @@ void CPU::ld_SP_HL() // LD SP, HL
 
 void CPU::inc_r8(uint16_t &reg, bool is_high) // INC r8
 {
-    uint8_t val {};
+    uint8_t val, temp {};
     if(is_high)
     {
         val = Register::get_register_high(reg);
+        temp = val;
         val++;
         Register::set_register_high(reg, val);
     }
     else 
     {
         val = Register::get_register_low(reg);
+        temp = val;
         val++;
         Register::set_register_low(reg, val);
     }  
-}
-void CPU::dec_r8(uint16_t &reg, bool is_high) // DEC r8
-{
-    uint8_t val {};
-    if(is_high)
-    {
-        val = Register::get_register_high(reg);
-        val--;
-        Register::set_register_high(reg, val);
-    }
-    else 
-    {
-        val = Register::get_register_low(reg);
-        val--;
-        Register::set_register_low(reg, val);
-    }  
+    set_zero_flag(val == 0);
+    set_subtraction_flag(false);
+    set_halfcarry_flag((temp & 0x0F) == 0x0F); //Set if overflow from bit 3
 }
 void CPU::inc_mHL() // INC [HL]
 {
     uint8_t val = read(reg_hl);
+    uint8_t temp = val;
     val++;
     write(reg_hl, val);
+    set_zero_flag(val == 0);
+    set_subtraction_flag(false);
+    set_halfcarry_flag((temp & 0x0F) == 0x0F); //Set if overflow from bit 3
+}
+void CPU::dec_r8(uint16_t &reg, bool is_high) // DEC r8
+{
+    uint8_t val, temp {};
+    if(is_high)
+    {
+        val = Register::get_register_high(reg);
+        temp = val;
+        val--;
+        Register::set_register_high(reg, val);
+    }
+    else 
+    {
+        val = Register::get_register_low(reg);
+        temp = val;
+        val--;
+        Register::set_register_low(reg, val);
+    }
+    set_zero_flag(val == 0);
+    set_subtraction_flag(false); 
+    set_halfcarry_flag((temp & 0x0F) == 0); //Set if borrow from bit 4
 }
 void CPU::dec_mHL() // DEC [HL]
 {
     uint8_t val = read(reg_hl);
+    uint8_t temp = val;
     val--;
     write(reg_hl, val);
+    set_zero_flag(val == 0);
+    set_subtraction_flag(false);
+    set_halfcarry_flag((temp & 0x0F) == 0); //Set if borrow from bit 4
 } 
 
 void CPU::add_A_r8(uint16_t reg, bool is_high, bool carry) // ADD A, r8

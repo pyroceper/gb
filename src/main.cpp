@@ -30,7 +30,6 @@ int main()
     {
         step = getchar();
         cpu.execute();
-
     }
 
     return 0;
