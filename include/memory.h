@@ -15,6 +15,8 @@ class Memory
 
         std::array<uint8_t, 0x100> bootrom;
         std::array<uint8_t, 0x10000> rom;
+        
+        bool unmap_bootrom {};
 
         uint8_t read(uint16_t address);
         void write(uint16_t address, uint8_t value);

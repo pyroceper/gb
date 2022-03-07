@@ -20,7 +20,7 @@ int main()
     // cpu.reg_de = 0xFF56;
     // cpu.reg_hl = 0x000D;
 
-    Logger::debug = true;
+    //Logger::debug = true;
 
     //temp
     char step {};
@@ -29,7 +29,8 @@ int main()
     step = 'c';
     while(step != 'e')
     {
-        step = getchar();
+        if(Logger::debug)
+            step = getchar();
         cpu.execute();
     }
 

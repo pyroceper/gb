@@ -38,12 +38,18 @@ void CPU::execute()
     //fetch
     uint8_t opcode = fetch_byte();
 
+    if(reg_pc == 0x100 && memory.read(0xFF50) == 0x1)
+        memory.unmap_bootrom = true;
+
     //temp
-    fmt::print("\nPC: {0:#x}\n", reg_pc - 1);
-    fmt::print("opcode: {0:#x}\n", opcode);
-    fmt::print("A: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X}\n", get_reg_A(), get_reg_B(), get_reg_C(), get_reg_D(), get_reg_E());
-    fmt::print("H: {:02X} L: {:02X}\n", get_reg_H(), get_reg_L());
-    fmt::print("SP: {:02X}\n", reg_sp);    
+    if(Logger::debug) 
+    {
+        fmt::print("\nPC: {0:#x}\n", reg_pc - 1);
+        fmt::print("opcode: {0:#x}\n", opcode);
+        fmt::print("A: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X}\n", get_reg_A(), get_reg_B(), get_reg_C(), get_reg_D(), get_reg_E());
+        fmt::print("H: {:02X} L: {:02X}\n", get_reg_H(), get_reg_L());
+        fmt::print("SP: {:02X}\n", reg_sp);
+    }    
 
     switch(opcode)
     {
@@ -324,7 +330,8 @@ void CPU::cb_opcodes()
 {
     //fetch
     uint8_t opcode = fetch_byte();
-    fmt::print("opcode: {0:#x}\n", opcode);
+    if(Logger::debug)
+        fmt::print("opcode: {0:#x}\n", opcode);
 
     switch(opcode)
     {

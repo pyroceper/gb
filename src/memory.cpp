@@ -16,6 +16,7 @@ void Memory::load_bootROM(const std::string &path)
         bootrom.fill(0);
         bootrom_file.read(reinterpret_cast<char*>(&bootrom), bootrom_size);
         bootrom_file.close();
+        unmap_bootrom = false;
     }
     else 
     {
@@ -53,7 +54,7 @@ void Memory::load_ROM(const std::string &path)
 uint8_t Memory::read(uint16_t address)
 {
     //TODO FIX THIS
-    if(address < 0x100)
+    if(address < 0x100 && !unmap_bootrom)
         return bootrom[address];
     return rom[address];
 }
@@ -61,9 +62,9 @@ uint8_t Memory::read(uint16_t address)
 void Memory::write(uint16_t address, uint8_t value)
 {
     //TODO FIX THIS
-    if((address & 0xFF) == 0x01)
+    if(address == 0xFF01)
         fmt::print("[0xFF01] = {0:#x}\n", value);
-    if((address & 0xFF) == 0x02)
+    if(address == 0xFF02)
         fmt::print("[0xFF02] = {0:#x}\n", value);
     rom[address] = value;
 }
