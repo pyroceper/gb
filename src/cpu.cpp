@@ -33,6 +33,69 @@ void CPU::increment_cycle(int cycle)
     cycles += cycle * 4;
 }
 
+void CPU::interrupt_handler()
+{
+    if(enable_interrupt)
+    {
+        bool is_interrupt = memory.read(interrupt_enable) & memory.read(interrupt_flag);
+        if(is_interrupt)
+        {
+            memory.write(--reg_sp, Register::get_register_high(reg_pc));
+            memory.write(--reg_sp, Register::get_register_low(reg_pc));
+
+            if( (memory.read(interrupt_enable) & memory.read(interrupt_flag))  &  0b0001)
+            {
+                enable_interrupt = false;
+                uint8_t vblank_flag = memory.read(interrupt_flag);
+                vblank_flag = vblank_flag & 0xFE; // set last bit to 0
+                memory.write(interrupt_flag, vblank_flag);
+                reg_pc = iv_vblank;
+                return;
+            }
+
+            if( (memory.read(interrupt_enable) & memory.read(interrupt_flag))  &  0b0010)
+            {
+                enable_interrupt = false;
+                uint8_t lcd_stat_flag = memory.read(interrupt_flag);
+                lcd_stat_flag = lcd_stat_flag & 0xFD; // set second last bit to 0
+                memory.write(interrupt_flag, lcd_stat_flag);
+                reg_pc = iv_lcd_stat;
+                return;
+            }
+
+            if( (memory.read(interrupt_enable) & memory.read(interrupt_flag))  &  0b0100)
+            {
+                enable_interrupt = false;
+                uint8_t timer_flag = memory.read(interrupt_flag);
+                timer_flag = timer_flag & 0xFB; // 0b11111011
+                memory.write(interrupt_flag, timer_flag);
+                reg_pc = iv_timer;
+                return;
+            }
+            
+            if( (memory.read(interrupt_enable) & memory.read(interrupt_flag))  &  0b1000)
+            {
+                enable_interrupt = false;
+                uint8_t serial_flag = memory.read(interrupt_flag);
+                serial_flag = serial_flag & 0xF7; // 0b11110111
+                memory.write(interrupt_flag, serial_flag);
+                reg_pc = iv_serial;
+                return;
+            }
+
+            if( (memory.read(interrupt_enable) & memory.read(interrupt_flag))  &  0b10000)
+            {
+                enable_interrupt = false;
+                uint8_t joypad_flag = memory.read(interrupt_flag);
+                joypad_flag = joypad_flag & 0xEF; // 0b11101111
+                memory.write(interrupt_flag, joypad_flag);
+                reg_pc = iv_joypad;
+                return;
+            }
+        }
+    }
+}
+
 void CPU::execute()
 {
     //fetch
@@ -1146,7 +1209,7 @@ void CPU::reti()
     reg_pc = address;
 
     //TODO
-    interrupt_enabled = true;
+    enable_interrupt = true;
 }
 
 void CPU::call()
@@ -1653,12 +1716,12 @@ void CPU::jp_HL() // JP HL
 void CPU::di()
 {
     //TODO
-    interrupt_enabled = false;
+    enable_interrupt = false;
 }
 void CPU::ei()
 {
     //TODO
-    interrupt_enabled = true;
+    enable_interrupt = true;
 }
 
 void CPU::stop()

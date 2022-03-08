@@ -31,6 +31,7 @@ int main()
     {
         if(Logger::debug)
             step = getchar();
+        cpu.interrupt_handler();
         cpu.execute();
     }
 

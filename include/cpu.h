@@ -68,7 +68,7 @@ class CPU
         bool flag_c; // carry
 
         bool halted;
-        bool interrupt_enabled;
+        bool enable_interrupt;
 
         //interrupt registers
         const uint16_t interrupt_enable = 0xFFFF;
